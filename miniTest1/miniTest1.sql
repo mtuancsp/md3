@@ -133,8 +133,19 @@ from course join point on course.id = point.course_id
 group by course.id;
 
 -- Đưa ra khóa học có điểm trung bình cao nhất
-select course.name, ROUND(avg(point.point), 2) as 'Điểm_trung_bình'
-from course join point on course.id = point.course_id
-group by course.id
-order by Điểm_trung_bình desc
-limit 1;
+SELECT c.name, ROUND(p.avg_point, 2) AS 'Điểm_trung_bình'
+FROM (
+   SELECT course_id, AVG(point) AS avg_point
+   FROM point
+   GROUP BY course_id
+) AS p
+JOIN course AS c ON p.course_id = c.id
+JOIN (
+   SELECT MAX(avg_point) AS max_point
+   FROM (
+      SELECT AVG(point) AS avg_point
+      FROM point
+      GROUP BY course_id
+   ) AS t
+) AS m ON p.avg_point = m.max_point;
+
