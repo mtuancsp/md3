@@ -60,16 +60,22 @@ use quanlybanhang;
 
 -- Hiển thị thông tin các hóa đơn trong bảng Order
 SELECT oID, oDate, oTotalPrice AS oPrice
-FROM Orders;
+FROM Orders
+# HAVING oTotalPrice > 10
+;
 
 -- Hiển thị danh sách khách hàng và sản phẩm đã mua
-SELECT c.Name AS CustomerName, p.pName AS ProductName
-FROM Customer c
-JOIN Orders o ON c.cID = o.cID
-JOIN OrderDetail od ON o.oID = od.oID
-JOIN Product p ON od.pID = p.pID;
+SELECT Name AS CustomerName, pName AS ProductName
+FROM Customer
+JOIN Orders using(cID)
+JOIN OrderDetail using(oID)
+JOIN Product using(pID);
 
 -- Hiển thị tên khách hàng không mua bất kỳ sản phẩm nào
+SELECT Name
+FROM Customer
+WHERE cID NOT IN (SELECT cID FROM orders);
+
 SELECT c.Name
 FROM Customer c
 LEFT JOIN Orders o ON c.cID = o.cID

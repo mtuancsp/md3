@@ -137,9 +137,9 @@ SELECT SUM(IF(status = 'Shipped', 1, 0))   AS Shipped,
 FROM orders;
 
 -- hoặc đơn giản hơn
-# SELECT SUM(status = 'Shipped') AS Shipped,
-#        SUM(status = 'Cancelled') AS Cancelled
-# FROM orders;
+SELECT SUM(status = 'Shipped') AS Shipped,
+       SUM(status = 'Cancelled') AS Cancelled
+FROM orders;
 
 -- tính toán số ngày giữa ngày vận chuyển và ngày yêu cầu trong đơn đặt hàng
 -- chúng ta sử dụng DATEDIFF
@@ -163,11 +163,11 @@ SELECT *
 FROM orders
 WHERE orderDate BETWEEN DATE_ADD(@startDate2, INTERVAL -1 MONTH) AND @startDate2;
 
--- các đơn hàng năm 2005
+-- các đơn hàng năm 2004
 SELECT *
 FROM orders
-WHERE YEAR(orderDate) = 2005;
-# WHERE orderDate >= '2004-01-01' AND orderDate < '2005-01-01'
+# WHERE YEAR(orderDate) = 2004;
+WHERE orderDate >= '2004-01-01' AND orderDate < '2005-01-01';
 -- câu WHERE này sẽ cho hiệu năng tốt hơn
 
 -- các đơn hàng theo từng quý năm 2004
@@ -433,4 +433,17 @@ FROM orderdetails od
 ) o ON od.orderNumber = o.orderNumber;
 
 SELECT * FROM temp_orderDetails;
+
+-- index
+EXPLAIN SELECT * FROM customers WHERE customerName = 'Land of Toys Inc.';
+
+ALTER TABLE customers ADD INDEX idx_customerName(customerName);
+EXPLAIN SELECT * FROM customers WHERE customerName = 'Land of Toys Inc.';
+
+ALTER TABLE customers DROP INDEX idx_customerName;
+
+ALTER TABLE customers ADD INDEX idx_full_name(contactFirstName, contactLastName);
+EXPLAIN SELECT * FROM customers WHERE contactFirstName = 'Jean' or contactFirstName = 'King';
+
+ALTER TABLE customers DROP INDEX idx_full_name;
 

@@ -110,7 +110,7 @@ where fullname like 'Nguyễn%';
 -- HV có tên A
 select fullname
 from students
-where fullname like '%A';
+where fullname = '%A';
 
 -- HV có độ tuổi từ 18-25
 select fullname, age, c.name
@@ -137,6 +137,7 @@ from students s
 group by a.address;
 
 -- (Những) Khóa học có điểm trung bình cao nhất
+EXPLAIN
 SELECT course.name, avg(point.point) AS highest_avg_point
 FROM point
          join course on point.course_id = course.id
@@ -147,6 +148,16 @@ HAVING avg(point.point) = (SELECT avg(point.point) AS avg_point
                            ORDER BY avg_point DESC
                            LIMIT 1);
 
+EXPLAIN
+SELECT course.name, avg(point.point) AS highest_avg_point
+FROM point
+         join course on point.course_id = course.id
+GROUP BY point.course_id
+HAVING avg(point.point) >= ALL (SELECT avg(point.point) AS avg_point
+                                FROM point
+                                GROUP BY point.course_id);
+
+EXPLAIN
 SELECT course.name, round(avg(point.point), 3) AS highest_avg_point
 FROM point
          JOIN course ON point.course_id = course.id
@@ -166,26 +177,25 @@ group by course_id;
 set @max_avg = (SELECT MAX(avg_point)
                 FROM avgPoints);
 
+-- Khóa học có điểm trung bình cao nhất
+explain select *
+from avgPoints
+where avg_point = @max_avg;
+
 -- Điểm trung bình của các khóa học
 select *
 from avgPoints;
 
--- Khóa học có điểm trung bình cao nhất
-select *
-from avgPoints
-where avg_point = @max_avg;
-
 -- Đưa ra khóa học có điểm trung bình cao nhất
+EXPLAIN
 SELECT c.name, ROUND(p.avg_point, 2) AS 'Điểm_trung_bình'
 FROM (SELECT course_id, AVG(point) AS avg_point
       FROM point
       GROUP BY course_id)
          AS p
-         JOIN course AS c
-              ON p.course_id = c.id
+         JOIN course AS c ON p.course_id = c.id
          JOIN (SELECT MAX(avg_point) AS max_point
                FROM (SELECT AVG(point) AS avg_point
                      FROM point
                      GROUP BY course_id) AS t)
     AS m ON p.avg_point = m.max_point;
-
