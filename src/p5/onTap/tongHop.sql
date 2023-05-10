@@ -280,13 +280,13 @@ WHERE orderNumber is NULL;
 
 -- (Self Join) khi một bảng có khóa ngoài tham chiếu tới khóa chính của chính nó
 -- Ví dụ: Bảng employees có một khóa ngoài là reportsTo tham chiếu tới khóa chính employeeNumber của chính bảng employees
-SELECT concat(e1.lastName, ' ', e1.firstName) as fullname,
+EXPLAIN SELECT concat(e1.lastName, ' ', e1.firstName) as fullname,
        e1.email,
        concat(e2.lastName, ' ', e2.firstName) as manager,
        e2.email                               as manager_email
 FROM employees e1 JOIN employees e2 ON e1.reportsTo = e2.employeeNumber;
 -- hoặc có thể viết
-SELECT concat(e1.lastName, ' ', e1.firstName) as fullname,
+EXPLAIN SELECT concat(e1.lastName, ' ', e1.firstName) as fullname,
        e1.email,
        concat(e2.lastName, ' ', e2.firstName) as manager,
        e2.email                               as manager_email
